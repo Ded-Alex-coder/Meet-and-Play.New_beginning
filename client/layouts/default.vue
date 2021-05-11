@@ -1,7 +1,16 @@
 <template>
   <div class="container mx-auto w-screen h-screen flex flex-row">
-    <Nav :navItemMenu="navItemMenu" :navBottomMenu="navBottomMenu" />
+    <Nav
+      v-show="show"
+      :navItemMenu="navItemMenu"
+      :navBottomMenu="navBottomMenu"
+    />
     <div class="flex h-screen w-75 flex-col flex-grow overflow-y-auto relative">
+      <MobileHeader
+        v-show="!show"
+        :navItemMenu="navItemMenu"
+        :navBottomMenu="navBottomMenu"
+      />
       <Nuxt />
     </div>
   </div>
@@ -9,10 +18,14 @@
 
 <script>
 export default {
+  name: 'layouts',
   components: {
     Nav: () => import('@/components/Layouts/Nav'),
+    MobileHeader: () => import('@/components/ModileHeader'),
   },
   data: () => ({
+    clientWidth: null,
+    show: null,
     navItemMenu: [
       {
         name: 'Главная',
@@ -66,6 +79,29 @@ export default {
       },
     ],
   }),
+
+  mounted() {
+    this.clientWidth =
+      document.documentElement.clientWidth <= 1024 // задаем условия для смены видимости компонентов
+        ? (this.show = false)
+        : (this.show = true)
+  },
+
+  methods: {
+    onResize() {
+      this.clientWidth =
+        document.documentElement.clientWidth <= 1024 // задаем условия для смены видимости компонентов
+          ? (this.show = false)
+          : (this.show = true)
+    },
+  },
+  created() {
+    window.addEventListener('resize', this.onResize) // подписываемся на изменения размеров экрана:
+    this.onResize
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.onResize)
+  },
 }
 </script>
 
